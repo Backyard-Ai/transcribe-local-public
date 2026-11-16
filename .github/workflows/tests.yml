@@ -4,6 +4,8 @@ name: Tests
 
 on:
   push:
+    # Dependabot's branches are tested once, through their pull request.
+    branches-ignore: ["dependabot/**"]
   pull_request:
 
 permissions:
@@ -14,10 +16,10 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install ffmpeg
@@ -31,6 +33,9 @@ jobs:
           Get-Content requirements.txt | Where-Object { $_ -notmatch '^(torch==|--extra-index-url)' } | Set-Content ci-requirements.txt
           python -m pip install -r ci-requirements.txt
           python -m pip install -e . --no-deps
+          # Fails if any two packages disagree, for example a version PyTorch doesn't accept.
+          # The steps above install PyTorch separately, so pip would otherwise only warn.
+          python -m pip check
       - name: Run tests
         shell: pwsh
         run: |

@@ -13,6 +13,14 @@ updates:
       - dependency-name: torch
       - dependency-name: ctranslate2
       - dependency-name: faster-whisper
+      # Runs the voice detector, so a change can alter which speech gets transcribed.
+      - dependency-name: onnxruntime
+      # Limits set by other packages: sympy (used by PyTorch) needs mpmath below 1.4, and
+      # PyTorch 2.11 needs setuptools below 82. Raise these when those packages are updated.
+      - dependency-name: mpmath
+        versions: [">=1.4"]
+      - dependency-name: setuptools
+        versions: [">=82"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
