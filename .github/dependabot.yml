@@ -1,0 +1,19 @@
+# Proposes updates when a package or GitHub Action has a newer or patched version.
+# Each proposal arrives as a pull request and runs the tests. Nothing changes until it's merged.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    ignore:
+      # The transcription libraries are tested together on real graphics cards. Update them on
+      # purpose, not automatically, because a change can alter transcripts.
+      - dependency-name: torch
+      - dependency-name: ctranslate2
+      - dependency-name: faster-whisper
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

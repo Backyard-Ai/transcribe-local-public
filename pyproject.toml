@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transcribe-local"
+version = "0.1.0"
+description = "Offline transcription of research interviews and focus groups for MAXQDA."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+    "faster-whisper",
+    "numpy",
+    "python-docx",
+    "soundfile",
+    "torch",
+]
+
+[project.optional-dependencies]
+dev = ["huggingface_hub", "pytest"]
+
+[project.scripts]
+transcribe-local = "transcribe_local.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

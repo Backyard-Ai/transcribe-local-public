@@ -1,0 +1,60 @@
+# Allow-list: everything is ignored unless named below, so research data
+# can't be committed by accident.
+*
+!.gitignore
+!README.md
+!CLAUDE.md
+!LICENSE
+!SECURITY.md
+!THIRD_PARTY_NOTICES.md
+!.github/
+!.github/**
+!pyproject.toml
+!requirements.txt
+!Transcribe Local.bat
+!Compare Transcripts.bat
+!src/
+!src/**
+!scripts/
+!scripts/**
+!tests/
+!tests/**
+!docs/
+!docs/**
+
+# Never commit these, even inside an allowed folder.
+__pycache__/
+*.pyc
+*.egg-info/
+.env
+*token*
+*.part
+# Recordings: every format the program accepts.
+*.aac
+*.aif
+*.aiff
+*.amr
+*.flac
+*.m4a
+*.m4v
+*.mkv
+*.mov
+*.mp3
+*.mp4
+*.oga
+*.ogg
+*.opus
+*.wav
+*.webm
+*.wma
+# Transcripts and anything derived from them.
+*.csv
+*.doc
+*.docx
+*.jsonl
+*.rtf
+*.srt
+*.txt
+*.vtt
+
+!requirements.txt
