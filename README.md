@@ -145,5 +145,8 @@ The same tests run on GitHub for every change.
 - Report bugs as a GitHub issue. **Never include real recordings, transcripts, file names, or
   screenshots that show them.** Use non-sensitive examples.
 - Report security problems privately, as described in [SECURITY.md](SECURITY.md).
+- To suggest a change, see [CONTRIBUTING.md](CONTRIBUTING.md).
+- Download a fixed version from the [Releases](https://github.com/Backyard-Ai/transcribe-local-public/releases)
+  page, or get the latest with `git pull`.
 - MIT License (see [LICENSE](LICENSE)). The model and other components have their own licenses,
   listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
