@@ -119,43 +119,66 @@ def _memory_gb() -> float:
         return 0.0
 
 
-def _nvidia_card_from_driver() -> str | None:
-    """The card name reported by NVIDIA's driver tool, which works even when CUDA doesn't."""
+def parse_driver_report(text: str) -> tuple[str, float | None, tuple[int, int] | None] | None:
+    """Name, memory in GB and generation from nvidia-smi's "name, memory.total, compute_cap" line.
+
+    Older drivers can't report the generation, so it may be missing.
+    """
+    lines = [line for line in text.strip().splitlines() if line.strip()]
+    if not lines:
+        return None
+    parts = [part.strip() for part in lines[0].split(",")]
+    if not parts[0]:
+        return None
+    memory = generation = None
+    try:
+        memory = float(parts[1]) / 1024
+    except (IndexError, ValueError):
+        pass
+    try:
+        major, minor = parts[2].split(".")
+        generation = (int(major), int(minor))
+    except (IndexError, ValueError):
+        pass
+    return parts[0], memory, generation
+
+
+def _nvidia_card_from_driver() -> tuple[str, float | None, tuple[int, int] | None] | None:
+    """The first card as NVIDIA's driver tool reports it. It comes with every NVIDIA driver."""
     tool = shutil.which("nvidia-smi")
     if not tool:
         return None
-    try:
-        result = subprocess.run(
-            [tool, "--query-gpu=name", "--format=csv,noheader"],
-            capture_output=True, text=True, timeout=10, creationflags=_NO_WINDOW,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return None
-    name = result.stdout.strip().splitlines()[0] if result.returncode == 0 and result.stdout.strip() else None
-    return name
+    # Drivers too old to report the generation reject the whole query, so ask again without it.
+    for fields in ("name,memory.total,compute_cap", "name,memory.total"):
+        try:
+            result = subprocess.run(
+                [tool, f"--query-gpu={fields}", "--format=csv,noheader,nounits"],
+                capture_output=True, text=True, timeout=10, creationflags=_NO_WINDOW,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        if result.returncode == 0:
+            return parse_driver_report(result.stdout)
+    return None
 
 
 def detect_computer() -> Computer:
     card_name = card_memory = problem = generation = None
-    try:
-        import torch
+    card = _nvidia_card_from_driver()
+    if card:
+        card_name, card_memory, generation = card
+        try:
+            from transcribe_local.cuda_libraries import make_findable
 
-        if torch.cuda.is_available():
-            properties = torch.cuda.get_device_properties(0)
-            card_name, card_memory = properties.name, properties.total_memory / 1024**3
-            generation = (properties.major, properties.minor)
-            import ctranslate2
+            if os.name == "nt" and not make_findable():
+                problem = "NVIDIA's graphics libraries aren't installed. Run scripts\\setup.ps1 again"
+            else:
+                import ctranslate2
 
-            if ctranslate2.get_cuda_device_count() < 1:
-                problem = "the transcription library can't reach the graphics card"
-    except Exception as error:  # A broken install shouldn't stop the processor from being used.
-        problem = f"the graphics card libraries didn't load ({error})"
-
-    if card_name is None:
-        driver_card = _nvidia_card_from_driver()
-        if driver_card:
-            card_name = driver_card
-            problem = problem or "an NVIDIA card is installed, but CUDA isn't working. Updating the NVIDIA driver usually fixes this"
+                if ctranslate2.get_cuda_device_count() < 1:
+                    problem = "the transcription library can't reach the graphics card. Updating the NVIDIA driver usually fixes this"
+        except Exception as error:  # A broken install shouldn't stop the processor from being used.
+            problem = f"the graphics card libraries didn't load ({error})"
 
     return Computer(
         system=platform.platform(),

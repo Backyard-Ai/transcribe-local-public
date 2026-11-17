@@ -2,7 +2,7 @@
 
 import os
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 # Cards newer than the transcription library (see hardware.LIBRARY_NEWEST_CARD) have
 # its code translated by the NVIDIA driver on first use, and the driver keeps the result

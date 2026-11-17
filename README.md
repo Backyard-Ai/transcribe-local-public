@@ -37,7 +37,7 @@ but makes it many times faster.
 3. From that folder, run `powershell -ExecutionPolicy Bypass -File scripts\setup.ps1`.
    Add `-DataFolder "D:\TranscriptionData"` to keep data somewhere other than the default.
 
-Setup installs about 3 GB of Python packages and downloads the 3 GB model, which are the only
+Setup installs about 1.5 GB of Python packages and downloads the 3 GB model, which are the only
 steps that use the internet. It finishes by checking the computer: which settings it chose,
 whether the data folder is synced or encrypted, and a quick test run. To see that report again:
 `.venv\Scripts\python -m transcribe_local.hardware --test`.

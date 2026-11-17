@@ -34,6 +34,10 @@ finishes so jobs resume after a crash, writes DOCX, TXT and a review CSV, then d
 working WAV. `compare.py` scores the app's transcripts against existing ones and prints
 numbers and anonymous labels only.
 
+On the card, CTranslate2 uses NVIDIA's cuBLAS and cuDNN from CUDA 12, installed from NVIDIA's
+own packages and made findable by `cuda_libraries.py`. `hardware.py` reads the card's name,
+memory and generation from `nvidia-smi`, which comes with every NVIDIA driver.
+
 ## Decisions already made with the owner, don't revisit without asking
 
 - No speaker labels. Automatic labels were wrong in testing, and a wrong label is worse than none.
@@ -142,8 +146,22 @@ and small card profiles on real cards; and any computer other than the desktop.
 - Getting ready to share (2026-11-16): MIT `LICENSE`, `SECURITY.md`, `THIRD_PARTY_NOTICES.md`
   (all dependencies and the model are permissive; FFmpeg is installed separately, not bundled),
   an issue template warning against posting data, a Windows test run on GitHub
-  (`.github/workflows/tests.yml`, CPU-only PyTorch, no model needed) and monthly Dependabot
-  updates that skip torch, ctranslate2 and faster-whisper, since those change transcripts and
-  need testing on real cards. `scripts/download_models.py` pins the model to one revision.
-  New top-level files must be added to the `.gitignore` allow-list.
+  (`.github/workflows/tests.yml`, no model needed, ends with `pip check`) and monthly
+  Dependabot updates that skip ctranslate2, faster-whisper, onnxruntime and the NVIDIA
+  packages, since those change transcripts and need testing on real cards.
+  `scripts/download_models.py` pins the model to one revision. New top-level files must be
+  added to the `.gitignore` allow-list. The public repo's `main` is protected: no deletion or
+  force-push for anyone, and pull requests need the "test" check; the owner (repository admin)
+  is exempt from the check, which is what lets publishing push straight to `main`.
+- PyTorch removed (0.1.1, 2026-11-16). It was installed only to make CUDA's libraries findable
+  and to read the card's details, and it carried security alerts. PyTorch 2.11 is the last
+  build with CUDA 12.8; newer ones are CUDA 13, which CTranslate2 4.8.5 can't use, or CUDA
+  12.6, which gave identical transcripts but ran at half speed on the RTX 5060 (its libraries
+  predate Blackwell). The NVIDIA packages are pinned to exactly what PyTorch 2.11 supplied
+  (cuBLAS 12.8.4.1, cuDNN 9.19.0.56, CUDA runtime 12.8.90). Tested on the laptop's RTX 5060
+  with a Windows text-to-speech sample: word-for-word the same transcript as with PyTorch,
+  about 12.7x real time against 13.1x, the gap being a fixed ~0.4 s for loading the libraries,
+  which PyTorch used to do before the timer. Installed size went from 4.5 GB to 1.9 GB.
+  `setup.ps1` removes PyTorch from existing installs. Still to check on the desktop's RTX 3060:
+  run `git pull` and `scripts\setup.ps1`, then confirm the quick test passes on the card.
 - Commit messages end with the co-author line used in the existing history.

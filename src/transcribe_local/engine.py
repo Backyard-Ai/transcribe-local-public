@@ -69,8 +69,9 @@ def is_card_failure(error: Exception, device: str) -> bool:
 
 def load_model(model_path: Path, device: str, compute_type: str, cpu_threads: int):
     if device == "cuda":
-        # torch adds the CUDA libraries that CTranslate2 needs to the DLL search path.
-        import torch  # noqa: F401
+        from transcribe_local.cuda_libraries import make_findable
+
+        make_findable()
     from faster_whisper import WhisperModel
 
     return WhisperModel(

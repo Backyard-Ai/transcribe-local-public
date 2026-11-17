@@ -51,12 +51,20 @@ if (-not (Test-Path $venvPython)) {
     if ($LASTEXITCODE -ne 0) { throw 'Creating the Python environment failed.' }
 }
 
-Step 'Installing Python packages (about 3 GB the first time)'
+Step 'Installing Python packages (about 1.5 GB the first time)'
 & $venvPython -m pip install --upgrade pip --quiet
 & $venvPython -m pip install -r (Join-Path $root 'requirements.txt') --quiet
 if ($LASTEXITCODE -ne 0) { throw 'Installing packages failed.' }
 & $venvPython -m pip install -e $root --no-deps --quiet
 if ($LASTEXITCODE -ne 0) { throw 'Installing the program failed.' }
+
+# Versions before 0.1.1 installed PyTorch only to find NVIDIA's graphics libraries, which now
+# come from NVIDIA's own packages. Removing it and the packages only it used frees about 2.5 GB.
+if (Test-Path (Join-Path $root '.venv\Lib\site-packages\torch')) {
+    Step 'Removing PyTorch, which is no longer needed'
+    & $venvPython -m pip uninstall -y torch sympy mpmath networkx --quiet
+    if ($LASTEXITCODE -ne 0) { throw 'Removing PyTorch failed.' }
+}
 
 if (-not (Test-Path (Join-Path $root 'models\faster-whisper-large-v3\model.bin'))) {
     Step 'Downloading the model (about 3 GB)'

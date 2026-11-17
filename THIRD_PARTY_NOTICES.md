@@ -2,7 +2,8 @@
 
 Transcribe Local's own code is under the MIT License (see `LICENSE`). It doesn't include any
 other project's code. Setup downloads the pieces below onto your computer, each under its own
-license. All of them allow free use, including in research.
+license. All of them allow free use, including in research. Most are open source; NVIDIA's
+libraries are free to use but not open source.
 
 ## The speech model
 
@@ -24,7 +25,8 @@ license. All of them allow free use, including in research.
 | Package | License |
 |---|---|
 | faster-whisper, CTranslate2, onnxruntime, python-docx | MIT |
-| PyTorch, NumPy, PyAV, soundfile, lxml | BSD |
+| NumPy, PyAV, soundfile, lxml | BSD |
+| nvidia-cublas-cu12, nvidia-cudnn-cu12, nvidia-cuda-runtime-cu12 (NVIDIA's graphics libraries) | NVIDIA's own license (free to use, not open source) |
 | huggingface_hub, tokenizers | Apache-2.0 |
 | tqdm | MPL-2.0 and MIT |
 | The rest (helper packages) | MIT, BSD, Apache-2.0 or PSF |

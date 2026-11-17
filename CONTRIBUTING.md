@@ -29,8 +29,9 @@ the same model on every computer.
    request and must pass.
 4. Open a pull request saying what changed and why.
 
-Changes to the transcription libraries (PyTorch, CTranslate2, faster-whisper, onnxruntime) or the
-model need testing on a real graphics card, because they can change transcripts.
+Changes to the transcription libraries (CTranslate2, faster-whisper, onnxruntime, and NVIDIA's
+cuBLAS, cuDNN and CUDA runtime packages) or the model need testing on a real graphics card,
+because they can change transcripts.
 
 By contributing, you agree that your contribution is licensed under the MIT License, like the
 rest of the project.
